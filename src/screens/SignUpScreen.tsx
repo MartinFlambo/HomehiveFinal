@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button } from 'react-native-elements';
 import { StackScreenProps } from '@react-navigation/stack';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { ImageBackground } from 'react-native';
 
 const auth = getAuth();
 
@@ -37,9 +38,14 @@ const SignUpScreen: React.FC<StackScreenProps<any>> = ({ navigation }) => {
     }
   }
 
+  const headerImage = require('../../assets/images/headerImage.png')
+
   return (
     <View style={styles.container}>
-      <Text>Signup screen!</Text>
+      <View style={styles.header}>
+        <ImageBackground source={headerImage} style={styles.header}/>
+      </View>
+      <Text style={styles.title}>Crear Cuenta</Text>
 
       {!!value.error && <View style={styles.error}><Text>{value.error}</Text></View>}
 
@@ -59,19 +65,30 @@ const SignUpScreen: React.FC<StackScreenProps<any>> = ({ navigation }) => {
           secureTextEntry={true}
         />
 
-        <Button title="Sign up" buttonStyle={styles.control} onPress={signUp} />
+        <Button title="Sign up" buttonStyle={styles.buttonSend} onPress={signUp} />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginVertical: 10,
+    fontFamily: "lato",
+    textAlign: "center",
+  },
+
   container: {
     flex: 1,
-    paddingTop: 20,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+  },
+  header: {
+    alignSelf: 'stretch',
+    width: null,
+    height: 200
   },
 
   TextInput:{
@@ -79,10 +96,21 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
+    borderRadius: 10,
+    width: '80%'
   },
 
   control: {
-    marginTop: 10
+    marginTop: 10,
+    width: '100%',
+    padding: 10,
+    alignItems: "center",
+  },
+
+  buttonSend: {
+    marginTop: 20,
+    borderRadius: 10,
+    width: '100%'
   },
 
   error: {
