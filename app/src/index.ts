@@ -1,16 +1,23 @@
 import express from 'express';
 import "dotenv/config";
+import authRoutes from "./routes/authRoutes";
+import taskRoutes from "./routes/taskRoutes";
+import path from "path";
 
-import authRoutes from "./routes/authRoutes"
-
+import { connectDB } from "./lib/db";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(express.json());
 app.use("/api/auth", authRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/static", express.static(path.join(__dirname, "..", "public")));
 
-
-app.listen(PORT,() =>{
+connectDB().then(() => {
+  app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-})
-
+  });
+}).catch((err) => {
+  console.error("Failed to connect to MongoDB", err);
+});
