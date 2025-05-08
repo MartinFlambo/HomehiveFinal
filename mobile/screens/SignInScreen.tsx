@@ -1,10 +1,6 @@
 import React from "react";
 import { ImageBackground, StyleSheet, Text, TextInput, View } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
 import { Input, Button } from "react-native-elements";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-
-const auth = getAuth();
 
 const SignInScreen = () => {
   const [value, setValue] = React.useState({
@@ -12,27 +8,6 @@ const SignInScreen = () => {
     password: "",
     error: "",
   });
-
-  async function signIn() {
-    if (value.email === "" || value.password === "") {
-      setValue({
-        ...value,
-        error: "Email and password are mandatory.",
-      });
-      return;
-    }
-
-    try {
-      await signInWithEmailAndPassword(auth, value.email, value.password);
-    } catch (error) {
-      if (error instanceof Error) {
-        setValue({
-          ...value,
-          error: error.message,
-        });
-      }
-    }
-  }
 
   const headerImage = require('../../assets/images/headerImage.png')
 
@@ -62,7 +37,7 @@ const SignInScreen = () => {
               secureTextEntry={true}
             />
     
-            <Button title="Iniciar sesión" buttonStyle={styles.buttonSend} onPress={signIn} />
+            <Button title="Iniciar sesión" buttonStyle={styles.buttonSend}/>
           </View>
         </View>
   );
