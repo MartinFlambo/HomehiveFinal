@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { Input, Button } from 'react-native-elements';
+
+import { Button } from 'react-native-elements';
 import { StackScreenProps } from '@react-navigation/stack';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { ImageBackground } from 'react-native';
 
-const auth = getAuth();
+
 
 const SignUpScreen: React.FC<StackScreenProps<any>> = ({ navigation }) => {
   const [value, setValue] = React.useState({
@@ -14,29 +14,6 @@ const SignUpScreen: React.FC<StackScreenProps<any>> = ({ navigation }) => {
     password: '',
     error: ''
   })
-
-  async function signUp() {
-    if (value.email === '' || value.password === '') {
-      setValue({
-        ...value,
-        error: 'Email and password are mandatory.'
-      })
-      return;
-    }
-  
-    try {
-      await createUserWithEmailAndPassword(auth, value.email, value.password);
-      navigation.navigate('Sign In');
-    } catch (error) {
-      if (error instanceof Error) {
-        setValue({
-          ...value,
-          error: error.message,
-        })
-        return;
-      }
-    }
-  }
 
   const headerImage = require('../../assets/images/headerImage.png')
 
@@ -65,7 +42,7 @@ const SignUpScreen: React.FC<StackScreenProps<any>> = ({ navigation }) => {
           secureTextEntry={true}
         />
 
-        <Button title="Sign up" buttonStyle={styles.buttonSend} onPress={signUp} />
+        <Button title="Sign up" buttonStyle={styles.buttonSend} />
       </View>
     </View>
   );

@@ -1,10 +1,9 @@
 import React from 'react';
-import { useAuthentication } from '../utils/hooks/useAuthentication';
 import UserStack from './userStack';
 import AuthStack from './authStack';
 
 export default function RootNavigation() {
-  const { user } = useAuthentication();
+  const isLoggedIn = false; // Cambia esto según el estado de autenticación del usuario
 
-  return user ? <UserStack /> : <AuthStack />;
+  return isLoggedIn ? <UserStack /> : <AuthStack />;
 }
