@@ -52,4 +52,32 @@ router.get("/", protectRoute, async (req, res) => {
   }
 });
 
+router.get("/user", protectRoute, async (req, res) => {
+  try {
+    const tasks = await Task.find({user: req.user?._id}).sort({ createdAt: -1 })
+    res.json(tasks)
+  } catch (error) {
+    console.log("Error al obtener el usuario:", error);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+});
+
+router.delete("/:id", protectRoute, async(req, res) =>{
+  try{
+    const task = await Task.findById(req.params.id);
+    if(!task){
+      return res.status(404).json({message: "Tarea no encontrada"});
+    }
+    if(task.user.toString() !== req.user?._id.toString()){
+      return res.status(401).json({message: "No autorizado"});
+    }
+    await task.deleteOne();
+    res.status(200).json({message: "Tarea eliminada"});
+  }
+  catch(error){
+    console.log("Error al eliminar la tarea");
+    res.status(500).json({message: "Error del servidor"});
+  }
+})
+
 export default router;
