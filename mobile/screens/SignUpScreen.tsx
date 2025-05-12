@@ -1,52 +1,65 @@
-import React from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import React from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View
+} from "react-native";
 
-import { Button } from 'react-native-elements';
-import { StackScreenProps } from '@react-navigation/stack';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { ImageBackground } from 'react-native';
-
-
+import { StackScreenProps } from "@react-navigation/stack";
+import { ImageBackground } from "react-native";
+import { Button } from "react-native-elements";
 
 const SignUpScreen: React.FC<StackScreenProps<any>> = ({ navigation }) => {
   const [value, setValue] = React.useState({
-    email: '',
-    password: '',
-    error: ''
-  })
+    email: "",
+    password: "",
+    error: "",
+  });
 
-  const headerImage = require('../../assets/images/headerImage.png')
+  const headerImage = require("../../assets/images/headerImage.png");
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <ImageBackground source={headerImage} style={styles.header}/>
-      </View>
-      <Text style={styles.title}>Crear Cuenta</Text>
+    <KeyboardAvoidingView style={{ flex: 1}} behavior= {Platform.OS === "ios" ? "padding": "height"}>
+      <ScrollView>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <ImageBackground source={headerImage} style={styles.header} />
+          </View>
+          <Text style={styles.title}>Crear Cuenta</Text>
 
-      {!!value.error && <View style={styles.error}><Text>{value.error}</Text></View>}
+          {!!value.error && (
+            <View style={styles.error}>
+              <Text>{value.error}</Text>
+            </View>
+          )}
 
-      <View style={styles.control}>
-        <TextInput
-          placeholder='Email'
-          style={styles.TextInput}
-          value={value.email}
-          onChangeText={(text) => setValue({ ...value, email: text })}
-        />
+          <View style={styles.control}>
+            <TextInput
+              placeholder="Email"
+              style={styles.TextInput}
+              value={value.email}
+              onChangeText={(text) => setValue({ ...value, email: text })}
+            />
 
-        <TextInput
-          placeholder='Password'
-          style={styles.TextInput}
-          value={value.password}
-          onChangeText={(text) => setValue({ ...value, password: text })}
-          secureTextEntry={true}
-        />
+            <TextInput
+              placeholder="Password"
+              style={styles.TextInput}
+              value={value.password}
+              onChangeText={(text) => setValue({ ...value, password: text })}
+              secureTextEntry={true}
+            />
 
-        <Button title="Sign up" buttonStyle={styles.buttonSend} />
-      </View>
-    </View>
+            <Button title="Sign up" buttonStyle={styles.buttonSend} />
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   title: {
@@ -63,23 +76,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   header: {
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
     width: null,
-    height: 200
+    height: 200,
   },
 
-  TextInput:{
+  TextInput: {
     height: 40,
     margin: 12,
     borderWidth: 1,
     padding: 10,
     borderRadius: 10,
-    width: '80%'
+    width: "80%",
   },
 
   control: {
     marginTop: 10,
-    width: '100%',
+    width: "100%",
     padding: 10,
     alignItems: "center",
   },
@@ -87,15 +100,15 @@ const styles = StyleSheet.create({
   buttonSend: {
     marginTop: 20,
     borderRadius: 10,
-    width: '100%'
+    width: "100%",
   },
 
   error: {
     marginTop: 10,
     padding: 10,
-    color: '#fff',
-    backgroundColor: '#D54826FF',
-  }
+    color: "#fff",
+    backgroundColor: "#D54826FF",
+  },
 });
 
 export default SignUpScreen;

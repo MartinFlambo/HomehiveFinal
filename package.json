@@ -1,7 +1,7 @@
 {
   "name": "homehive",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "mobile/app/index.ts",
   "private": true,
   "license": "0BSD",
   "scripts": {
