@@ -1,59 +1,146 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  View
+  TouchableOpacity,
+  View,
 } from "react-native";
-
+import { Ionicons } from "@expo/vector-icons";
 import { StackScreenProps } from "@react-navigation/stack";
-import { ImageBackground } from "react-native";
-import { Button } from "react-native-elements";
 
-const SignUpScreen: React.FC<StackScreenProps<any>> = ({ navigation }) => {
-  const [value, setValue] = React.useState({
-    email: "",
-    password: "",
-    error: "",
-  });
+const Login: React.FC<StackScreenProps<any>> = ({ navigation }) => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const headerImage = require("../../assets/images/headerImage.png");
+  const handleLogin = () => {
+    setIsLoading(true);
+    console.log("Login function triggered");
+    setTimeout(() => setIsLoading(false), 2000);
+  };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1}} behavior= {Platform.OS === "ios" ? "padding": "height"}>
-      <ScrollView>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.container}>
-          <View style={styles.header}>
-            <ImageBackground source={headerImage} style={styles.header} />
+          <View style={styles.topIllustration}>
+            <Image
+              source={require("../../assets/images/headerImage.png")}
+              resizeMode="contain"
+            />
           </View>
-          <Text style={styles.title}>Crear Cuenta</Text>
 
-          {!!value.error && (
-            <View style={styles.error}>
-              <Text>{value.error}</Text>
+          <View style={styles.card}>
+            <View style={styles.formContainer}>
+              <View style={styles.title}>
+                <Text style={styles.titleText}>Registrarse</Text>
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Nombre de usuario</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons
+                    name="person-outline"
+                    size={20}
+                    color="#1E90FF"
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Inserta tu nombre de usuario"
+                    placeholderTextColor="#aaa"
+                    value={username}
+                    onChangeText={(text) => setUsername(text)}
+                    keyboardType="default"
+                    autoCapitalize="none"
+                  />
+                </View>
+              </View>
+              {/* EMAIL */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Email</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons
+                    name="mail-outline"
+                    size={20}
+                    color="#1E90FF"
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Inserta tu email"
+                    placeholderTextColor="#aaa"
+                    value={email}
+                    onChangeText={(text) => setEmail(text)}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </View>
+              </View>
+
+              {/* PASSWORD */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Password</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color="#1E90FF"
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Inserta tu contraseña"
+                    placeholderTextColor="#aaa"
+                    value={password}
+                    onChangeText={(text) => setPassword(text)}
+                    secureTextEntry={!showPassword}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={styles.eyeIcon}
+                  >
+                    <Ionicons
+                      name={showPassword ? "eye-outline" : "eye-off-outline"}
+                      size={20}
+                      color="#1E90FF"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
-          )}
 
-          <View style={styles.control}>
-            <TextInput
-              placeholder="Email"
-              style={styles.TextInput}
-              value={value.email}
-              onChangeText={(text) => setValue({ ...value, email: text })}
-            />
+            {/* BOTÓN LOGIN */}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleLogin}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Crear Cuenta</Text>
+              )}
+            </TouchableOpacity>
 
-            <TextInput
-              placeholder="Password"
-              style={styles.TextInput}
-              value={value.password}
-              onChangeText={(text) => setValue({ ...value, password: text })}
-              secureTextEntry={true}
-            />
-
-            <Button title="Sign up" buttonStyle={styles.buttonSend} />
+            {/* FOOTER */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>¿Ya tienes cuenta?</Text>
+              <TouchableOpacity onPress={() => navigation.navigate("Sign In")}>
+                <Text style={styles.linkText}>Inicia Sesión</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -62,53 +149,91 @@ const SignUpScreen: React.FC<StackScreenProps<any>> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginVertical: 10,
-    fontFamily: "lato",
-    textAlign: "center",
-  },
-
   container: {
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
+    padding: 20,
   },
-  header: {
-    alignSelf: "stretch",
-    width: null,
-    height: 200,
-  },
-
-  TextInput: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 10,
-    width: "80%",
-  },
-
-  control: {
-    marginTop: 10,
+  topIllustration: {
     width: "100%",
-    padding: 10,
+    height: 200,
+    justifyContent: "center",
     alignItems: "center",
   },
-
-  buttonSend: {
-    marginTop: 20,
+  card: {
+    backgroundColor: "#f9f9f9",
+    padding: 20,
     borderRadius: 10,
+    width: "90%",
+    elevation: 5,
+    alignItems: "center",
+  },
+  formContainer: {
     width: "100%",
   },
-
-  error: {
+  title:{
+    width:"100%",
+    alignItems:"center",
+    marginBottom: 20
+  },
+  titleText:{
+    fontSize: 22,
+    fontWeight: 600
+  },
+  inputGroup: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingLeft: 10,
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 10,
+  },
+  input: {
+    flex: 1,
+    height: 40,
+  },
+  button: {
+    backgroundColor: "#1E90FF",
     marginTop: 10,
+    width: 200,
+    borderRadius: 10,
+    alignItems: "center",
     padding: 10,
+  },
+  buttonText: {
     color: "#fff",
-    backgroundColor: "#D54826FF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  footer: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  footerText: {
+    fontSize: 14,
+    color: "#666",
+  },
+  linkText: {
+    fontSize: 14,
+    color: "#1E90FF",
+    fontWeight: "bold",
   },
 });
 
-export default SignUpScreen;
+export default Login;
