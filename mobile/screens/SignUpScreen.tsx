@@ -21,7 +21,7 @@ const Login: React.FC<StackScreenProps<any>> = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
+  const handleSignUp= () => {
     setIsLoading(true);
     console.log("Login function triggered");
     setTimeout(() => setIsLoading(false), 2000);
@@ -124,7 +124,7 @@ const Login: React.FC<StackScreenProps<any>> = ({ navigation }) => {
             {/* BOTÓN LOGIN */}
             <TouchableOpacity
               style={styles.button}
-              onPress={handleLogin}
+              onPress={handleSignUp}
               disabled={isLoading}
             >
               {isLoading ? (
