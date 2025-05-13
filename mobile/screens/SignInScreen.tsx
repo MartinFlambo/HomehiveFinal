@@ -21,9 +21,7 @@ const Login: React.FC<StackScreenProps<any>> = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = () => {
-    setIsLoading(true);
-    console.log("Login function triggered");
-    setTimeout(() => setIsLoading(false), 2000);
+   
   };
 
   return (
