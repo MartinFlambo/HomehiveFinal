@@ -12,19 +12,22 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuthStore } from "../store/authStore";
 import { StackScreenProps } from "@react-navigation/stack";
+import { Alert } from "react-native";
 
 const Login: React.FC<StackScreenProps<any>> = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, isLoading, register } = useAuthStore();
 
-  const handleSignUp= () => {
-    setIsLoading(true);
-    console.log("Login function triggered");
-    setTimeout(() => setIsLoading(false), 2000);
+  const handleSignUp = async () => {
+    const result = await register(username, email, password);
+    if (!result.success) {
+      Alert.alert("Error", result.error);
+    }
   };
 
   return (
@@ -172,14 +175,14 @@ const styles = StyleSheet.create({
   formContainer: {
     width: "100%",
   },
-  title:{
-    width:"100%",
-    alignItems:"center",
-    marginBottom: 20
+  title: {
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 20,
   },
-  titleText:{
+  titleText: {
     fontSize: 22,
-    fontWeight: 600
+    fontWeight: 600,
   },
   inputGroup: {
     marginBottom: 15,
