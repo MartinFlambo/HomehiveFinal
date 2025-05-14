@@ -22,7 +22,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     register: async (username: string, email: string, password: string) =>{
         set({isLoading: true});
         try{
-            const response = await fetch("http://localhost:3000/api/auth/register", {
+            const response = await fetch("https://homehivefinal.onrender.com/api/auth/register", {
                 method: "POST",
                 headers:{
                     "Content-Type": "application/json"
