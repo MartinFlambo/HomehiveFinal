@@ -82,7 +82,7 @@ router.post("/login", async (req: Request, res: Response): Promise<Response> => 
         return res.status(400).json({ message: "Debes rellenar todos los campos" });
       }
   
-      const user = await User.findOne({ email })
+      const user = await User.findOne({ email }).select("+password");
       if (!user) {
         return res.status(400).json({ message: "Introduce las credenciales correctas" });
       }
