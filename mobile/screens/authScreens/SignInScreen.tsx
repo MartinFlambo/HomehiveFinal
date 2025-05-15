@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { StackScreenProps } from "@react-navigation/stack";
-import { useAuthStore } from "../store/authStore";
+import { useAuthStore } from "../../store/authStore";
 
 const Login: React.FC<StackScreenProps<any>> = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -37,7 +37,7 @@ const Login: React.FC<StackScreenProps<any>> = ({ navigation }) => {
         <View style={styles.container}>
           <View style={styles.topIllustration}>
             <Image
-              source={require("../assets/images/headerImage.png")}
+              source={require("../../assets/images/headerImage.png")}
               resizeMode="contain"
             />
           </View>

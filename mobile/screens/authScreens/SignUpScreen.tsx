@@ -12,7 +12,7 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useAuthStore } from "../store/authStore";
+import { useAuthStore } from "../../store/authStore";
 import { StackScreenProps } from "@react-navigation/stack";
 import { Alert } from "react-native";
 
@@ -40,7 +40,7 @@ const Login: React.FC<StackScreenProps<any>> = ({ navigation }) => {
         <View style={styles.container}>
           <View style={styles.topIllustration}>
             <Image
-              source={require("../assets/images/headerImage.png")}
+              source={require("../../assets/images/headerImage.png")}
               resizeMode="contain"
             />
           </View>
