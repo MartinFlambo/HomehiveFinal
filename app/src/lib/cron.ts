@@ -1,13 +1,14 @@
 import { CronJob } from "cron";
 import https from "https";
 
-const job = new CronJob("*/14 * * * *", function(){
-    const url = process.env.API_URL;
+const job = new CronJob("*/2 * * * *", function(){
+    const url = process.env.API_URL_PING;
     if(!url){
         console.error("API_URL is not defined");
         return;
     }
     https.get(url, (res)=>{
+        console.log("Sending request to:", url);
         if(res.statusCode === 200)
             console.log ("Cron job executed successfully");
         else

@@ -109,4 +109,10 @@ router.post("/login", async (req: Request, res: Response): Promise<Response> => 
     }
   });
 
+// Endpoint para ping (usado por el cron job para mantener activo el servidor)
+router.get("/ping", (req: Request, res: Response) => {
+  res.status(200).json({ message: "pong" });
+});
+
+
 export default router;
