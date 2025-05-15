@@ -40,7 +40,7 @@ const Login: React.FC<StackScreenProps<any>> = ({ navigation }) => {
         <View style={styles.container}>
           <View style={styles.topIllustration}>
             <Image
-              source={require("../../assets/images/headerImage.png")}
+              source={require("../assets/images/headerImage.png")}
               resizeMode="contain"
             />
           </View>
