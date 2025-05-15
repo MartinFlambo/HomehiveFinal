@@ -1,7 +1,7 @@
 import { CronJob } from "cron";
 import https from "https";
 
-const job = new CronJob("*/2 * * * *", function(){
+const job = new CronJob("*/13 * * * *", function(){
     const url = process.env.API_URL_PING;
     if(!url){
         console.error("API_URL is not defined");

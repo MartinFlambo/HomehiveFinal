@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { Button } from "react-native-elements";
 import Logo from "../components/Logo";
+import { useAuthStore } from "../store/authStore";
 
 const WelcomeScreen: React.FC<StackScreenProps<any>> = ({ navigation }) => {
+  const { user, token, checkAuth} = useAuthStore()
+
+
+  useEffect(()=> {
+    checkAuth()
+  })
   return (
     <View style={styles.container}>
       <Logo />

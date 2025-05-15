@@ -1,15 +1,16 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
+import { useAuthStore } from "../store/authStore";
 
 
 export default function HomeScreen() {
-
+  const {user, token, logout} = useAuthStore()
   return (
     <View style={styles.container}>
       <Text>Bienvenido!</Text>
 
-      <Button title="Sign Out" style={styles.button}/>
+      <Button title="Sign Out" style={styles.button} onPress={logout}/>
     </View>
   );
 }

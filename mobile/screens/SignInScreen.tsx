@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -13,15 +14,17 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { StackScreenProps } from "@react-navigation/stack";
+import { useAuthStore } from "../store/authStore";
 
 const Login: React.FC<StackScreenProps<any>> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { isLoading, login}= useAuthStore();
 
-  const handleLogin = () => {
-   
+  const handleLogin = async () => {
+   const result = await login(email, password);
+   if(!result.success) Alert.alert("Error", result.error || "Error de inicio de sesión");
   };
 
   return (
@@ -34,7 +37,7 @@ const Login: React.FC<StackScreenProps<any>> = ({ navigation }) => {
         <View style={styles.container}>
           <View style={styles.topIllustration}>
             <Image
-              source={require("../../assets/images/headerImage.png")}
+              source={require("../assets/images/headerImage.png")}
               resizeMode="contain"
             />
           </View>
