@@ -10,12 +10,12 @@ import {
   Image,
   StyleSheet,
   Platform,
+  SafeAreaView,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Button, Divider } from "react-native-elements";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "react-native/Libraries/NewAppScreen";
-import { SafeAreaView } from "react-native";
 import { useTaskStore } from "../../store/taskStore";
 
 export default function CreateTaskScreen() {
