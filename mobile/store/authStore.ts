@@ -1,6 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+  profileImage: string;
+}
+
 interface RegisterResult {
   success: boolean;
   error?: string;
@@ -11,7 +18,7 @@ interface LoginResults {
 }
 
 interface AuthState {
-  user: string | null;
+  user: User | null;
   token: string | null;
   isLoading: boolean;
   register: (
@@ -68,7 +75,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const token = await AsyncStorage.getItem("token");
       const userJson = await AsyncStorage.getItem("user");
-      const user = userJson ? JSON.parse(userJson) : null;
+      const user: User | null = userJson ? JSON.parse(userJson) : null;
 
       set({ token, user });
     } catch (error) {

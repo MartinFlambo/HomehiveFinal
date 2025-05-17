@@ -9,63 +9,73 @@ import {
   Alert,
   Image,
   StyleSheet,
-  ActivityIndicator,
+  Platform,
 } from "react-native";
-import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import { Button, Divider } from "react-native-elements";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "react-native/Libraries/NewAppScreen";
+import { SafeAreaView } from "react-native";
+import { useTaskStore } from "../../store/taskStore";
 
 export default function CreateTaskScreen() {
+  const { create, isLoading } = useTaskStore();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dificult, setDificult] = useState(3);
-  const [image, setImage] = useState(""); 
-  const [loading, setLoading] = useState(false);
+  const [image, setImage] = useState("");
 
-  const router = useRouter();
+  const pickImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-  const allowedImages = ["aspirar.jpg", "limpiar.jpg", "ordenar.jpg"];
-
-  const handleSubmit = async () => {
-    if (!title || !description || !image) {
-      Alert.alert("Error", "Por favor, rellena todos los campos");
+    if (permissionResult.status !== "granted") {
+      Alert.alert("Permiso denegado", "Se necesita acceso a la galería.");
       return;
     }
 
-    setLoading(true);
-    try {
-      const response = await fetch("http://tu-api.com/tasks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          dificult,
-          image, 
-        }),
-      });
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.5,
+      base64: true,
+    });
 
-      if (!response.ok) {
-        throw new Error("Error al crear la tarea");
-      }
+    if (!result.canceled && result.assets.length > 0) {
+      const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+      setImage(base64Image);
+    }
+  };
 
-      Alert.alert("Éxito", "Tarea creada correctamente");
-      router.push("/tasks");
-    } catch (error) {
-      Alert.alert("Error", "Hubo un problema al crear la tarea");
-      console.error(error);
+  const takePhoto = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (permissionResult.status !== "granted") {
+      Alert.alert("Permiso denegado", "Se necesita acceso a la cámara.");
+      return;
     }
 
-    setLoading(false);
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+      setImage(base64Image);
+    }
   };
 
   const renderDificultPicker = () => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       stars.push(
-        <TouchableOpacity key={i} onPress={() => setDificult(i)} style={styles.button}>
+        <TouchableOpacity
+          key={i}
+          onPress={() => setDificult(i)}
+          style={styles.stars}
+        >
           <Ionicons
             name={i <= dificult ? "star" : "star-outline"}
             size={32}
@@ -77,74 +87,163 @@ export default function CreateTaskScreen() {
     return <View style={styles.ratingContainer}>{stars}</View>;
   };
 
-  const renderImageSelector = () => {
-    return (
-      <View style={styles.imageSelectorContainer}>
-        {allowedImages.map((img) => (
-          <TouchableOpacity key={img} onPress={() => setImage(img)} style={styles.imageOption}>
-            <Image source={{ uri: `http://tu-api.com/images/${img}` }} style={styles.previewImage} />
-            <Text style={styles.imageText}>{img}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    );
+  const handleSubmit = async () => {
+    if (!title || !description || !image) {
+      Alert.alert("Error", "Por favor, rellena todos los campos");
+      return;
+    }
+
+    const result = await create(title, description, dificult.toString(), image);
+
+    if (result.success) {
+      Alert.alert("Éxito", "Tarea creada correctamente");
+      setTitle("");
+      setDescription("");
+      setDificult(3);
+      setImage("");
+    } else {
+      Alert.alert("Error", result.error || "No se pudo crear la tarea");
+    }
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.card}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Crear Tarea</Text>
-            <Text style={styles.subtitle}>Añade los detalles de la tarea</Text>
-          </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+      >
+        <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.card}>
+            <View style={styles.header}>
+              <Text style={styles.title}>Crear Tarea</Text>
+              <Text style={styles.subtitle}>
+                Añade los detalles de la tarea
+              </Text>
+            </View>
 
-          <View style={styles.form}>
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Nombre de la tarea</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Inserta el nombre de la tarea"
-                value={title}
-                onChangeText={setTitle}
+            <View style={styles.form}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Nombre de la tarea</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color="#1E90FF"
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Inserta el nombre de la tarea"
+                    placeholderTextColor="#aaa"
+                    value={title}
+                    onChangeText={setTitle}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Descripción</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color="#1E90FF"
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Añade una descripción"
+                    value={description}
+                    onChangeText={setDescription}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Dificultad</Text>
+                {renderDificultPicker()}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Imagen</Text>
+                <View style={styles.imageInput}>
+                  <Button title="Galería" onPress={pickImage} type="outline" />
+                  <Button title="Cámara" onPress={takePhoto} type="outline" />
+                </View>
+
+                {image !== "" && (
+                  <View style={styles.previewContainer}>
+                    <Image
+                      source={{ uri: image }}
+                      style={styles.previewImage}
+                    />
+                    <Button
+                      title="Eliminar imagen"
+                      onPress={() => setImage("")}
+                      type="clear"
+                      icon={
+                        <Ionicons
+                          name="close-circle"
+                          size={20}
+                          color="#ff4444"
+                        />
+                      }
+                      titleStyle={{ color: "#ff4444", marginLeft: 6 }}
+                      buttonStyle={{ marginTop: 10 }}
+                    />
+                  </View>
+                )}
+              </View>
+              <Divider />
+              <Button
+                onPress={handleSubmit}
+                loading={isLoading}
+                title="Crear Tarea"
+                type="solid"
+                disabled={isLoading}
+                style={{ marginTop: 30 }}
               />
             </View>
-
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Descripción</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Añade una descripción"
-                value={description}
-                onChangeText={setDescription}
-              />
-            </View>
-
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Dificultad</Text>
-              {renderDificultPicker()}
-            </View>
-
-            <View style={styles.formGroup}>
-              <Text style={styles.label}>Seleccionar Imagen</Text>
-              {renderImageSelector()}
-            </View>
-
-            <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
-              {loading ? <ActivityIndicator color={Colors.white} /> : <Text style={styles.buttonText}>Confirmar</Text>}
-            </TouchableOpacity>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  imageInput: {
+    width: "100%",
+    gap: 10,
+  },
+
+  previewContainer: {
+    marginTop: 10,
+    alignItems: "center",
+  },
+  removeImageButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  removeImageText: {
+    color: "#ff4444",
+    marginLeft: 6,
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+
+  inputGroup: {
+    gap: 0,
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    alignContent: "center",
   },
   card: {
     backgroundColor: "#f9f9f9",
@@ -158,7 +257,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 40,
   },
   title: {
     fontSize: 22,
@@ -171,9 +270,15 @@ const styles = StyleSheet.create({
   },
   form: {
     marginBottom: 20,
+    gap: 15,
   },
-  formGroup: {
-    marginBottom: 15,
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingLeft: 10,
   },
   label: {
     fontSize: 16,
@@ -182,49 +287,26 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    fontSize: 16,
-    color: "#333",
+    flex: 1,
     height: 40,
   },
   ratingContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginVertical: 10,
   },
   button: {
-    backgroundColor: "#1E90FF",
-    padding: 15,
-    borderRadius: 5,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
-  },
-  imageSelectorContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
     marginTop: 10,
+    width: 200,
+    borderRadius: 10,
   },
-  imageOption: {
+  stars: {
     alignItems: "center",
-    marginHorizontal: 5,
+    padding: 15,
   },
   previewImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 5,
-  },
-  imageText: {
-    marginTop: 5,
-    color: "#333",
-    fontSize: 14,
+    width: "100%",
+    height: 200,
+    borderRadius: 8,
+    marginTop: 10,
   },
 });

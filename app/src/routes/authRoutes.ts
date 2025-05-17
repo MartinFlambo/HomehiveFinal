@@ -64,7 +64,7 @@ router.post(
           _id: user._id,
           username: user.username,
           email: user.email,
-          profileInage: user.profileImage,
+          profileImage: user.profileImage,
         },
       });
     } catch (error) {
@@ -97,7 +97,7 @@ router.post("/login", async (req: Request, res: Response): Promise<Response> => 
       return res.status(200).json({
         token,
         user: {
-          id: user._id,
+          _id: user._id,
           username: user.username,
           email: user.email,
           profileImage: user.profileImage,
