@@ -5,16 +5,13 @@ import protectRoute from "../middleware/auth.middleware";
 
 const router = express.Router();
 
-// Lista de imágenes válidas
-const allowedImages = ["aspirar.jpg"];
-
 router.post("/", protectRoute, async (req, res) => {
   try {
     const { title, description, dificult, image } = req.body;
 
-    if (!allowedImages.includes(image)) {
-      return res.status(400).json({ message: "Imagen no permitida" });
-    }
+   if (!image || typeof image !== "string") {
+  return res.status(400).json({ message: "Imagen inválida" });
+}
 
     const task = await Task.create({
       title,
