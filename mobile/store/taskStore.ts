@@ -23,7 +23,7 @@ export const useTaskStore = create<TaskState>((set) => ({
     set({ isLoading: true });
 
     try {
-      const token = useAuthStore.getState().token; 
+      const token = useAuthStore.getState().token;
 
       if (!token) {
         throw new Error("Usuario no autenticado");
@@ -36,7 +36,7 @@ export const useTaskStore = create<TaskState>((set) => ({
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
-            "Accept": "application/json",
+            Accept: "application/json",
           },
           body: JSON.stringify({
             title,
@@ -47,10 +47,8 @@ export const useTaskStore = create<TaskState>((set) => ({
         }
       );
 
-      const text = await response.text();
-      console.log("Respuesta del servidor:", text);
-      console.log(image.length)
       const data = await response.json();
+      console.log("Respuesta del servidor:", data);
 
       if (!response.ok) throw new Error(data.message || "Algo salió mal");
 
