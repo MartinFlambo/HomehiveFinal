@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { useAuthStore } from "./authStore"; // Asegúrate de que la ruta sea correcta
+import { useAuthStore } from "./authStore";
+import { Task, TaskGetResult } from "../interfaces/interfaces";
 
 interface TaskCreateResult {
   success: boolean;
@@ -8,26 +9,26 @@ interface TaskCreateResult {
 
 interface TaskState {
   isLoading: boolean;
+  tasks: Task[] | null;
   create: (
     title: string,
     description: string,
     dificult: string,
     image: string
   ) => Promise<TaskCreateResult>;
+  getUserTasks: () => Promise<TaskGetResult>;
 }
 
 export const useTaskStore = create<TaskState>((set) => ({
   isLoading: false,
+  tasks: [],
 
   create: async (title, description, dificult, image) => {
     set({ isLoading: true });
 
     try {
       const token = useAuthStore.getState().token;
-
-      if (!token) {
-        throw new Error("Usuario no autenticado");
-      }
+      if (!token) throw new Error("Usuario no autenticado");
 
       const response = await fetch(
         "https://homehivefinal.onrender.com/api/tasks/",
@@ -38,30 +39,57 @@ export const useTaskStore = create<TaskState>((set) => ({
             Authorization: `Bearer ${token}`,
             Accept: "application/json",
           },
-          body: JSON.stringify({
-            title,
-            description,
-            dificult,
-            image,
-          }),
+          body: JSON.stringify({ title, description, dificult, image }),
         }
       );
 
       const data = await response.json();
-      console.log("Respuesta del servidor:", data);
+      if (!response.ok)
+        throw new Error(data.message || "Error al crear la tarea");
 
-      if (!response.ok) throw new Error(data.message || "Algo salió mal");
+      await useTaskStore.getState().getUserTasks();
 
       set({ isLoading: false });
       return { success: true };
     } catch (error) {
       set({ isLoading: false });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Error desconocido",
+      };
+    }
+  },
 
-      if (error instanceof Error) {
-        return { success: false, error: error.message };
-      }
+  getUserTasks: async () => {
+    set({ isLoading: true });
 
-      return { success: false, error: "Error desconocido" };
+    try {
+      const token = useAuthStore.getState().token;
+      if (!token) throw new Error("Usuario no encontrado");
+
+      const response = await fetch(
+        "https://homehivefinal.onrender.com/api/tasks/user",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      const data: Task[] = await response.json();
+      if (!response.ok) throw new Error("Algo salió mal obteniendo las tareas");
+
+      set({ isLoading: false, tasks: data });
+      return { success: true, tasks: data };
+    } catch (error) {
+      set({ isLoading: false });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Error desconocido",
+      };
     }
   },
 }));

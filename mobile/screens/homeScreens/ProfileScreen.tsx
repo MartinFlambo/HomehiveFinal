@@ -1,11 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, SafeAreaView } from "react-native";
 import { Button, Image } from "react-native-elements";
 import { useAuthStore } from "../../store/authStore";
+import { useTaskStore } from "../../store/taskStore";
+import { TaskGetResult } from "../../interfaces/interfaces";
 
-export default function CreateTaskScreen() {
-  const [task, setTasks] = useState([]);
-  const { user, token, logout } = useAuthStore();
+export default function ProfileScreen() {
+  const { user, logout } = useAuthStore();
+  const { getUserTasks, tasks, isLoading } = useTaskStore();
+
+  useEffect(() => {
+    getUserTasks();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -18,14 +24,30 @@ export default function CreateTaskScreen() {
             />
           </View>
           <View>
-            <View>
-              <Text>{user?.username}</Text>
-            </View>
-            <View>
-              <Text>{user?.email}</Text>
-            </View>
+            <Text>{user?.username}</Text>
+            <Text>{user?.email}</Text>
           </View>
         </View>
+
+        {isLoading && <Text>Cargando tareas...</Text>}
+        <View style={{ width: "100%" }}>
+          <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+            Tareas del usuario:
+          </Text>
+
+          {isLoading ? (
+            <Text>Cargando tareas...</Text>
+          ) : tasks?.length === 0 ? (
+            <Text style={{ fontStyle: "italic" }}>No tienes tareas aún.</Text>
+          ) : (
+            tasks?.map((task) => (
+              <View key={task._id} style={{ paddingVertical: 5 }}>
+                <Text>- {task.title}</Text>
+              </View>
+            ))
+          )}
+        </View>
+
         <View style={styles.buttonContainer}>
           <Button
             title="Cerrar Sesión"
@@ -62,8 +84,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   userInfo: {
-    width:"100%",
-    padding:20,
+    width: "100%",
+    padding: 20,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
