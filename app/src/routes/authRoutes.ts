@@ -51,7 +51,7 @@ router.post(
         return res.status(400).json({ message: "El email ya está registrado" });
       }
 
-      const profileImage = `https://api.dicebear.com/5.x/initials/svg?seed=${username}`;
+      const profileImage = `https://api.dicebear.com/5.x/adventurer/png?seed=${username}`; 
 
       const user = new User({ email, username, password, profileImage });
       await user.save();
