@@ -1,16 +1,70 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, SafeAreaView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  ScrollView,
+  Platform,
+} from "react-native";
 import { Button, Image } from "react-native-elements";
 import { useAuthStore } from "../../store/authStore";
 import { useTaskStore } from "../../store/taskStore";
-import { TaskGetResult } from "../../interfaces/interfaces";
+import { Alert } from "react-native";
+import TaskCard from "../../components/TaskCard";
 
 export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
-  const { getUserTasks, tasks, isLoading } = useTaskStore();
+  const { deleteTask , getUserTasks, tasks, isLoading } = useTaskStore();
+
+  const confirmLogout = () => {
+    Alert.alert(
+      "Cerrar sesión",
+      "¿Estás seguro de que deseas cerrar la sesión?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Cerrar sesión",
+          onPress: () => logout(),
+          style: "destructive",
+        },
+      ]
+    );
+  };
+
+  const confirmDeleteTask = async (id:string) => {
+    const { success, error } = await deleteTask(id);
+    if (success) {
+      Alert.alert("Tarea eliminada", "La tarea ha sido eliminada correctamente.")
+    }
+    else {
+      Alert.alert("Error", error || "Error al eliminar la tarea");
+    }
+  }
+
+  const handleDeleteTask = (id: string) => {
+    Alert.alert(
+      "Eliminar tarea",
+      "¿Estás seguro de que deseas eliminar esta tarea?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Eliminar",
+          onPress: () => confirmDeleteTask(id),
+          style: "destructive",
+        },
+      ]
+    );
+  };
 
   useEffect(() => {
-    getUserTasks();
+    getUserTasks(true);
   }, []);
 
   return (
@@ -24,34 +78,31 @@ export default function ProfileScreen() {
             />
           </View>
           <View>
-            <Text>{user?.username}</Text>
-            <Text>{user?.email}</Text>
+            <Text style={styles.userLabel}>{user?.username}</Text>
+            <Text style={styles.userLabel}>{user?.email}</Text>
           </View>
         </View>
 
-        {isLoading && <Text>Cargando tareas...</Text>}
-        <View style={{ width: "100%" }}>
-          <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-            Tareas del usuario:
-          </Text>
+        <View style={styles.taskContainer}>
+          <Text style={styles.taskTitle}>Tareas del usuario:</Text>
 
           {isLoading ? (
             <Text>Cargando tareas...</Text>
           ) : tasks?.length === 0 ? (
             <Text style={{ fontStyle: "italic" }}>No tienes tareas aún.</Text>
           ) : (
-            tasks?.map((task) => (
-              <View key={task._id} style={{ paddingVertical: 5 }}>
-                <Text>- {task.title}</Text>
-              </View>
-            ))
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+              {tasks?.map((task) => (
+                <TaskCard key={task._id} tarea={task} onLongPress={() => handleDeleteTask(task._id)}/>
+              ))}
+            </ScrollView>
           )}
         </View>
 
         <View style={styles.buttonContainer}>
           <Button
             title="Cerrar Sesión"
-            onPress={logout}
+            onPress={confirmLogout}
             type="outline"
             buttonStyle={styles.buttonLogout}
             titleStyle={styles.buttonTitle}
@@ -63,6 +114,28 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+  userLabel: {
+    fontWeight: "600",
+    fontSize: 16,
+    color: "#000",
+  },
+
+  taskContainer: {
+    flex: 1,
+    width: "100%",
+    paddingBottom: 10,
+  },
+
+  scrollContent: {
+    paddingBottom: 10,
+  },
+
+  taskTitle: {
+    fontWeight: "bold",
+    fontSize: 16,
+    marginBottom: 10,
+  },
+
   container: {
     flex: 1,
     backgroundColor: "#fff",

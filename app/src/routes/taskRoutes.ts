@@ -19,6 +19,7 @@ router.post("/", protectRoute, async (req, res) => {
       dificult,
       image,
       user: req.user!._id,
+      completed: false,
     });
 
     res.status(201).json(task);
@@ -51,13 +52,22 @@ router.get("/", protectRoute, async (req, res) => {
 
 router.get("/user", protectRoute, async (req, res) => {
   try {
-    const tasks = await Task.find({user: req.user?._id}).sort({ createdAt: -1 })
-    res.json(tasks)
+    const completed = req.query.completed === "true";
+
+    const filter: any = { user: req.user!._id };
+
+    if (req.query.completed !== undefined) {
+      filter.completed = completed;
+    }
+
+    const tasks = await Task.find(filter).sort({ createdAt: -1 });
+    res.json(tasks);
   } catch (error) {
-    console.log("Error al obtener el usuario:", error);
+    console.log("Error al obtener las tareas del usuario:", error);
     res.status(500).json({ message: "Error del servidor" });
   }
 });
+
 
 router.delete("/:id", protectRoute, async(req, res) =>{
   try{
@@ -73,6 +83,26 @@ router.delete("/:id", protectRoute, async(req, res) =>{
   }
   catch(error){
     console.log("Error al eliminar la tarea");
+    res.status(500).json({message: "Error del servidor"});
+  }
+})
+
+router.patch("/:id/complete", protectRoute, async(req, res) =>{
+  try{
+    const task = await Task.findById(req.params.id);
+    if(!task){
+      return res.status(404).json({message: "Tarea no encontrada"});
+    }
+    if(task.user.toString() !== req.user?._id.toString()){
+      return res.status(401).json({message: "No autorizado"});
+    }
+
+    task.completed = !task.completed;
+    await task.save();
+    res.status(200).json({message: "Tarea actualizada"});
+  }
+  catch(error){
+    console.log("Error al actualizar la tarea");
     res.status(500).json({message: "Error del servidor"});
   }
 })
