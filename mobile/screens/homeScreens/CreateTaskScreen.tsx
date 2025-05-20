@@ -127,7 +127,7 @@ export default function CreateTaskScreen() {
                 <Text style={styles.label}>Nombre de la tarea</Text>
                 <View style={styles.inputWrapper}>
                   <Ionicons
-                    name="lock-closed-outline"
+                    name="clipboard-outline"
                     size={20}
                     color="#1E90FF"
                     style={styles.inputIcon}
@@ -146,7 +146,7 @@ export default function CreateTaskScreen() {
                 <Text style={styles.label}>Descripción</Text>
                 <View style={styles.inputWrapper}>
                   <Ionicons
-                    name="lock-closed-outline"
+                    name="pencil-outline"
                     size={20}
                     color="#1E90FF"
                     style={styles.inputIcon}
