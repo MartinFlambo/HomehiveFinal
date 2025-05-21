@@ -51,7 +51,7 @@ export const useTaskStore = create<TaskState>((set) => ({
       if (!response.ok)
         throw new Error(data.message || "Error al crear la tarea");
 
-      await useTaskStore.getState().getUserTasks();
+      await useTaskStore.getState().getUserTasks(false);
 
       set({ isLoading: false });
       return { success: true };
@@ -87,7 +87,7 @@ export const useTaskStore = create<TaskState>((set) => ({
         throw new Error(data.message || "Error al crear la tarea");
       }
 
-      await useTaskStore.getState().getUserTasks();
+      await useTaskStore.getState().getUserTasks(false);
 
       set({ isLoading: false });
       return { success: true };
@@ -124,7 +124,7 @@ export const useTaskStore = create<TaskState>((set) => ({
         throw new Error(data.message || "Error al completar la tarea");
       }
 
-      await useTaskStore.getState().getUserTasks();
+      await useTaskStore.getState().getUserTasks(false);
 
       set({ isLoading: false });
       return { success: true };
@@ -144,9 +144,11 @@ export const useTaskStore = create<TaskState>((set) => ({
       const token = useAuthStore.getState().token;
       if (!token) throw new Error("Usuario no encontrado");
 
-      const url = completed
-        ? `https://homehivefinal.onrender.com/api/tasks/user?completed=${completed}`
-        : "https://homehivefinal.onrender.com/api/tasks/user";
+      const url =
+        completed !== undefined
+          ? `https://homehivefinal.onrender.com/api/tasks/user?completed=${completed}`
+          : "https://homehivefinal.onrender.com/api/tasks/user";
+
       const response = await fetch(url, {
         method: "GET",
         headers: {

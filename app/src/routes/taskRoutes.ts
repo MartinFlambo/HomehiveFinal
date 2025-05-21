@@ -12,6 +12,7 @@ router.post("/", protectRoute, async (req, res) => {
    if (!image || typeof image !== "string") {
   return res.status(400).json({ message: "Imagen inválida" });
 }
+    const score = parseInt(dificult, 10)*5
 
     const task = await Task.create({
       title,
@@ -20,6 +21,7 @@ router.post("/", protectRoute, async (req, res) => {
       image,
       user: req.user!._id,
       completed: false,
+      score
     });
 
     res.status(201).json(task);

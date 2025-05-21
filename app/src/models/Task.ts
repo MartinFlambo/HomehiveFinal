@@ -7,6 +7,7 @@ interface ITask {
   dificult: string;
   completed: boolean;
   user: Types.ObjectId;
+  score: number
   image: string; // ← nombre o path de imagen
 }
 
@@ -17,6 +18,7 @@ const taskSchema = new Schema<ITask>(
     dificult: { type: String, required: true },
     completed: { type: Boolean, default: false},
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    score: { type: Number, default: 0, required: true},
 
     image: { type: String, required: true },
   },
