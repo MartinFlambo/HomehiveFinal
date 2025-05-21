@@ -7,6 +7,7 @@ interface IUser {
   email: string;
   password: string;
   profileImage: string;
+  createdAt?: string;
 }
 
 interface IUserMethods {

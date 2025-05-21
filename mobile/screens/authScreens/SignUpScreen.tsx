@@ -94,7 +94,7 @@ const Login: React.FC<StackScreenProps<any>> = ({ navigation }) => {
 
               {/* PASSWORD */}
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Password</Text>
+                <Text style={styles.label}>Contraseña</Text>
                 <View style={styles.inputWrapper}>
                   <Ionicons
                     name="lock-closed-outline"

@@ -82,9 +82,25 @@ export default function ProfileScreen() {
               style={styles.imageProfile}
             />
           </View>
-          <View>
+          <View style={{ flex: 1, width: "100%" }}>
             <Text style={styles.userLabel}>{user?.username}</Text>
-            <Text style={styles.userLabel}>{user?.email}</Text>
+            <Text
+              style={styles.userLabel}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {user?.email}
+            </Text>
+            <Text style={styles.userLabel}>
+              Miembro desde:{" "}
+              {user?.createdAt
+                ? new Date(user.createdAt).toLocaleDateString("es-ES", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
+                : "Fecha desconocida"}
+            </Text>
           </View>
         </View>
 
@@ -95,9 +111,7 @@ export default function ProfileScreen() {
 
           <View style={styles.switchContainer}>
             <Text style={styles.switchLabel}>
-              {isEnabled
-                ? ""
-                : "Pulsa para ver las tareas completadas"}
+              {isEnabled ? "" : "Pulsa para ver las tareas completadas"}
             </Text>
             <Switch
               trackColor={{ false: "#767577", true: "#81b0ff" }}
@@ -132,21 +146,21 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   switchContainer: {
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
-  marginBottom: 10,
-  width: "100%",
-},
-switchLabel: {
-  fontSize: 14,
-  color: "#333",
-  marginRight: 10,
-},
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    width: "100%",
+  },
+  switchLabel: {
+    fontSize: 14,
+    color: "#333",
+    marginRight: 10,
+  },
 
   userLabel: {
-    fontWeight: "600",
-    fontSize: 16,
+    fontWeight: "500",
+    fontSize: 14,
     color: "#000",
   },
   taskContainer: {
