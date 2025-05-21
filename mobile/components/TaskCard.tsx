@@ -7,11 +7,13 @@ import type { PressableStateCallbackType } from "react-native";
 interface Props {
   tarea: Task;
   onLongPress?: () => void;
+  onPress?: () => void;
 }
 
-const TaskCard: React.FC<Props> = ({ tarea, onLongPress }) => {
+const TaskCard: React.FC<Props> = ({ tarea, onLongPress, onPress }) => {
   return (
     <Pressable
+      onPress={onPress}
       onLongPress={onLongPress}
       delayLongPress={500}
       style={(pressed: PressableStateCallbackType) => [
@@ -42,11 +44,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     transform: [{ scale: 0.94 }],
-
-
   },
   cardPressed: {
-    transform: [{ scale: 0.90 }],
+    transform: [{ scale: 0.9 }],
     shadowOpacity: 0.2,
     shadowRadius: 8,
     backgroundColor: "#f0f0f0",
