@@ -2,6 +2,9 @@ import { create } from "zustand";
 import { useAuthStore } from "./authStore";
 import { Task, TaskGetResult } from "../interfaces/interfaces";
 
+
+
+
 interface TaskCreateResult {
   success: boolean;
   error?: string;
@@ -9,7 +12,8 @@ interface TaskCreateResult {
 
 interface TaskState {
   isLoading: boolean;
-  tasks: Task[] | null;
+  pendingTasks: Task[];
+  completedTasks: Task[];
   create: (
     title: string,
     description: string,
@@ -25,7 +29,8 @@ interface TaskState {
 
 export const useTaskStore = create<TaskState>((set) => ({
   isLoading: false,
-  tasks: [],
+  pendingTasks: [],
+  completedTasks: [],
 
   create: async (title, description, dificult, image) => {
     set({ isLoading: true });
@@ -87,7 +92,7 @@ export const useTaskStore = create<TaskState>((set) => ({
         throw new Error(data.message || "Error al crear la tarea");
       }
 
-      await useTaskStore.getState().getUserTasks(false);
+      await useTaskStore.getState().getUserTasks();
 
       set({ isLoading: false });
       return { success: true };
@@ -124,7 +129,7 @@ export const useTaskStore = create<TaskState>((set) => ({
         throw new Error(data.message || "Error al completar la tarea");
       }
 
-      await useTaskStore.getState().getUserTasks(false);
+      await useTaskStore.getState().getUserTasks();
 
       set({ isLoading: false });
       return { success: true };
@@ -137,38 +142,50 @@ export const useTaskStore = create<TaskState>((set) => ({
     }
   },
 
-  getUserTasks: async (completed?: boolean) => {
-    set({ isLoading: true });
+  getUserTasks: async () => {
+  set({ isLoading: true });
 
-    try {
-      const token = useAuthStore.getState().token;
-      if (!token) throw new Error("Usuario no encontrado");
+  try {
+    const token = useAuthStore.getState().token;
+    if (!token) throw new Error("Usuario no encontrado");
 
-      const url =
-        completed !== undefined
-          ? `https://homehivefinal.onrender.com/api/tasks/user?completed=${completed}`
-          : "https://homehivefinal.onrender.com/api/tasks/user";
-
-      const response = await fetch(url, {
+    const [pendingRes, completedRes] = await Promise.all([
+      fetch("https://homehivefinal.onrender.com/api/tasks/user?completed=false", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-          Accept: "application/json",
         },
-      });
+      }),
+      fetch("https://homehivefinal.onrender.com/api/tasks/user?completed=true", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    ]);
 
-      const data: Task[] = await response.json();
-      if (!response.ok) throw new Error("Algo salió mal obteniendo las tareas");
+    const pending: Task[] = await pendingRes.json();
+    const completed: Task[] = await completedRes.json();
 
-      set({ isLoading: false, tasks: data });
-      return { success: true, tasks: data };
-    } catch (error) {
-      set({ isLoading: false });
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Error desconocido",
-      };
+    if (!pendingRes.ok || !completedRes.ok) {
+      throw new Error("Error al cargar tareas del usuario");
     }
-  },
+
+    set({
+      pendingTasks: pending,
+      completedTasks: completed,
+      isLoading: false,
+    });
+
+    return { success: true, tasks: [...pending, ...completed] }; // opcional
+  } catch (error) {
+    set({ isLoading: false });
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Error desconocido",
+    };
+  }
+}
 }));

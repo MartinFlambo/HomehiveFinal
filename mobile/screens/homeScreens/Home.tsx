@@ -15,8 +15,14 @@ import { useTaskStore } from "../../store/taskStore";
 
 export default function ProfileScreen() {
   const { user } = useAuthStore();
-  const { deleteTask, getUserTasks, tasks, isLoading, completeTask } =
-    useTaskStore();
+  const {
+    deleteTask,
+    getUserTasks,
+    completeTask,
+    pendingTasks,
+    completedTasks,
+    isLoading,
+  } = useTaskStore();
 
   const [isEnabled, setIsEnabled] = useState(false);
 
@@ -71,6 +77,7 @@ export default function ProfileScreen() {
       },
     ]);
   };
+  const visibleTasks = isEnabled ? completedTasks : pendingTasks;
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -124,11 +131,11 @@ export default function ProfileScreen() {
 
           {isLoading ? (
             <Text>Cargando tareas...</Text>
-          ) : tasks?.length === 0 ? (
+          ) : visibleTasks.length === 0 ? (
             <Text style={{ fontStyle: "italic" }}>No tienes tareas aún.</Text>
           ) : (
             <ScrollView contentContainerStyle={styles.scrollContent}>
-              {tasks?.map((task) => (
+              {visibleTasks.map((task) => (
                 <TaskCard
                   key={task._id}
                   tarea={task}
@@ -178,7 +185,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f9f9f9",
     alignItems: "center",
     justifyContent: "space-between",
     padding: 10,
@@ -205,5 +212,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderRadius: 10,
     borderWidth: 1,
+    borderColor: "#ccc",
+    backgroundColor: "#ffff"
   },
 });

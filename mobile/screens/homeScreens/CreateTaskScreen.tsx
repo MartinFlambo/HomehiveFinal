@@ -244,9 +244,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
     alignContent: "center",
+    backgroundColor: "#f9f9f9",
   },
   card: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
     shadowColor: "#000",

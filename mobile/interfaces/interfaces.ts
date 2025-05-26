@@ -3,6 +3,8 @@ export interface Task {
   title: string;
   description: string;
   dificult: string;
+  completed: boolean;
+  score: number;
   image: string;
   createdAt: string;
   updatedAt: string;
